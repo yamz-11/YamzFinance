@@ -6,9 +6,11 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -23,10 +25,28 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+
+                TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('type')
+
+                ToggleButtons::make('type')
+                    ->inline()
+                    ->default('expense')
+                    ->options([
+                        'income' => 'Income',
+                        'expense' => 'Expense',
+                    ])
+                    ->colors([
+                        'income' => 'success',
+                        'expense' => 'danger',
+                    ])
+                    ->icons([
+                        'income' => 'heroicon-o-arrow-up-circle',
+                        'expense' => 'heroicon-o-arrow-down-circle',
+                    ]),
+
+                Forms\Components\Toggle::make('is_active')
                     ->required(),
             ]);
     }
@@ -37,7 +57,14 @@ class CategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('type'),
+                Tables\Columns\SelectColumn::make('type')
+                    ->label('Cash Flow')
+                    ->options([
+                        'income' => 'Income',
+                        'expense' => 'Expense',
+                    ]),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

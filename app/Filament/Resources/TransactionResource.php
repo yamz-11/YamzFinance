@@ -7,12 +7,10 @@ use App\Filament\Resources\TransactionResource\RelationManagers;
 use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
+use App\Filament\Resources\CategoryResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -26,21 +24,19 @@ class TransactionResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
+                Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Select::make('category_id')
+                Forms\Components\Select::make('category_id')
                     ->relationship('category', 'name')
                     ->required(),
-                TextInput::make('description')
+                Forms\Components\TextInput::make('note')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('amount')
+                Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric(),
-                DatePicker::make('date')
-                    ->required(),
-                TextInput::make('type')
+                Forms\Components\DatePicker::make('date')
                     ->required(),
             ]);
     }
@@ -51,18 +47,28 @@ class TransactionResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('description')
+                Tables\Columns\TextColumn::make('category.type')
+                    ->label('Cash Flow')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'income' => 'success',
+                        'expense' => 'danger',
+                    })
+                    ->icon(fn(string $state): string => match ($state) {
+                        'income' => 'heroicon-o-arrow-up-circle',
+                        'expense' => 'heroicon-o-arrow-down-circle',
+                    })
                     ->searchable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->numeric(),
+                // Tables\Columns\TextColumn::make('note')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('type'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

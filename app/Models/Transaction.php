@@ -13,10 +13,9 @@ class Transaction extends Model
     protected $fillable = [
         'name',
         'category_id',
-        'description',
+        'note',
         'amount',
         'date',
-        'type'
     ];
 
     public function category(): BelongsTo{
