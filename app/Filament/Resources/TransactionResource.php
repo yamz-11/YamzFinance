@@ -45,7 +45,11 @@ class TransactionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('category.name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Transaction')
+                    ->description(fn (Transaction $record): string => $record->name)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('category.type')
                     ->label('Cash Flow')
@@ -59,8 +63,6 @@ class TransactionResource extends Resource
                         'expense' => 'heroicon-o-arrow-down-circle',
                     })
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->numeric(),
                 // Tables\Columns\TextColumn::make('note')
                 //     ->searchable(),
                 Tables\Columns\TextColumn::make('amount')
